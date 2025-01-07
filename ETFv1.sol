@@ -1,51 +1,51 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {IETFv1} from "./interfaces/IETFv1.sol";
-import {FullMath} from "./libraries/FullMath.sol";
-import {IERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/IERC20.sol";
-import {ERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/ERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/utils/SafeERC20.sol";
-import {Ownable} from "@openzeppelin/contracts@5.1.0/access/Ownable.sol";
+import {IETFv1} from "./interfaces/IETFv1.sol";//继承
+import {FullMath} from "./libraries/FullMath.sol";//继承
+import {IERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/IERC20.sol";//继承
+import {ERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/ERC20.sol";//继承
+import {SafeERC20} from "@openzeppelin/contracts@5.1.0/token/ERC20/utils/SafeERC20.sol";//继承
+import {Ownable} from "@openzeppelin/contracts@5.1.0/access/Ownable.sol";//继承
 
-contract ETFv1 is IETFv1, ERC20, Ownable {
-    using SafeERC20 for IERC20;
+contract ETFv1 is IETFv1, ERC20, Ownable {     //继承IETFv1，ERC20
+    using SafeERC20 for IERC20;  //using for？
     using FullMath for uint256;
 
-    uint24 public constant HUNDRED_PERCENT = 1000000; // 100%
+    uint24 public constant HUNDRED_PERCENT = 1000000; // 100%    //定义公开常量，1000000？
 
-    address public feeTo;
-    uint24 public investFee;
-    uint24 public redeemFee;
-    uint256 public minMintAmount;
+    address public feeTo; //定义公开地址
+    uint24 public investFee;//定义公开变量，无符号24位：投资费用
+    uint24 public redeemFee;//定义公开变量，无符号24位：redeemFee
+    uint256 public minMintAmount;//定义公开变量，无符号256位：最小铸造总量
 
-    address[] private _tokens;
+    address[] private _tokens;//定义地址字符串，私有：代币发行
     // Token amount required per 1 ETF share，used in the first invest
-    uint256[] private _initTokenAmountPerShares;
+    uint256[] private _initTokenAmountPerShares;//定义私有数字数组，初始化账户代币金额每份
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        address[] memory tokens_,
-        uint256[] memory initTokenAmountPerShares_,
-        uint256 minMintAmount_
-    ) ERC20(name_, symbol_) Ownable(msg.sender) {
-        _tokens = tokens_;
-        _initTokenAmountPerShares = initTokenAmountPerShares_;
-        minMintAmount = minMintAmount_;
+    constructor(     //构造函数
+        string memory name_,//临时存储name_
+        string memory symbol_,//临时存储symbol_
+        address[] memory tokens_,//临时存储代币的地址
+        uint256[] memory initTokenAmountPerShares_,//临时存储“初始化账户代币金额每份”
+        uint256 minMintAmount_//无符号整数256，最小铸造总数
+    ) ERC20(name_, symbol_) Ownable(msg.sender) {    //ERC20的（名字，symbol），ownable的发起地址
+        _tokens = tokens_;//token的转换
+        _initTokenAmountPerShares = initTokenAmountPerShares_;//开启“初始化账户代币金额每份”
+        minMintAmount = minMintAmount_;//转换
     }
 
-    function setFee(
-        address feeTo_,
-        uint24 investFee_,
-        uint24 redeemFee_
-    ) external onlyOwner {
-        feeTo = feeTo_;
-        investFee = investFee_;
-        redeemFee = redeemFee_;
+    function setFee( //setFee费的函数
+        address feeTo_, //定义地址
+        uint24 investFee_, //定义投资费
+        uint24 redeemFee_ //定义赎回费用
+    ) external onlyOwner {  //外部可见（仅Owner）
+        feeTo = feeTo_; //feeToo转换
+        investFee = investFee_; //转换
+        redeemFee = redeemFee_;  //转换
     }
 
-    function updateMinMintAmount(uint256 newMinMintAmount) external onlyOwner {
+    function updateMinMintAmount(uint256 newMinMintAmount) external onlyOwner {  //更新升级最小
         emit MinMintAmountUpdated(minMintAmount, newMinMintAmount);
         minMintAmount = newMinMintAmount;
     }
